@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archie Blyth — software development portfolio</title>
+<meta name="description" content="I like writing code. Swift and SwiftUI for iPhone apps, Python for problem-solving, and C# in Unity. Games are where some of that code gets tested; the code is the point.">
+<meta property="og:title" content="Archie Blyth — software development portfolio">
+<meta property="og:description" content="I like writing code. Swift and SwiftUI for iPhone apps, Python for problem-solving, and C# in Unity. Games are where some of that code gets tested; the code is the point.">
+<meta name="theme-color" content="#0c0911" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#faf7fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 32 32&quot;&gt;&lt;rect width=&quot;32&quot; height=&quot;32&quot; rx=&quot;6&quot; fill=&quot;#0c0911&quot;/&gt;&lt;path d=&quot;M9 11 4 16l5 5M23 11l5 5-5 5M19 8l-6 16&quot; fill=&quot;none&quot; stroke=&quot;#cb63ee&quot; stroke-width=&quot;2.6&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/&gt;&lt;/svg&gt;">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Sora:wght@700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>try{var t=localStorage.getItem("archie-theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+</head>
+<body class="has-boot">
+<a class="skip" href="#main">Skip to content</a>
+<nav class="nav" aria-label="Site">
+  <span class="progress" aria-hidden="true"></span>
+  <div class="wrap">
+    <a class="brand" href="index.html">archie.blyth</a>
+    <span class="hud-stat">build <b>ok</b> · 6 modules · 3 languages</span><div class="nav-links">
+      <a href="index.html#projects">Projects</a>
+      <a href="index.html#about">About</a>
+      <button class="theme" type="button" aria-label="Switch between light and dark theme" title="Light / dark">
+        <span class="theme-sun" aria-hidden="true"></span><span class="theme-moon" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div id="boot" aria-label="Intro">
+  <button class="skip-intro" type="button" id="skip">Skip intro →</button>
+  <div class="ide" role="group" aria-label="Archie's code">
+    <div class="ide-bar">
+      <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <div class="tabs" role="tablist"><button class="tab" role="tab" aria-selected="true" data-tab="main" type="button">main.swift</button><button class="tab" role="tab" aria-selected="false" data-tab="resell-logger" type="button">dataManager.swift</button><button class="tab" role="tab" aria-selected="false" data-tab="temperature-logger" type="button">temp.py</button><button class="tab" role="tab" aria-selected="false" data-tab="coconut-shy" type="button">Slingshot.cs</button></div>
+      <span class="ide-title">archie.run</span>
+    </div>
+    <div class="ide-body">
+      <div class="editor typing" id="editor" tabindex="0"></div>
+      <div class="console">
+        <div class="console-head"><span>console</span><span id="status">idle</span></div>
+        <div class="console-out" id="out"><span class="line show">▸ Press Run to build Archie's portfolio from source.</span></div>
+        <button class="run" id="run" type="button" disabled><span class="tri" aria-hidden="true"></span> Run <kbd>Enter</kbd></button>
+      </div>
+    </div>
+  </div>
+  <script type="text/plain" class="ide-file" data-key="main"><span class="cm">// main.swift — the entry point</span>
+<span class="kw">import</span> <span class="ty">Foundation</span>
+
+<span class="kw">let</span> archie = <span class="ty">Developer</span>(name: <span class="st">&quot;Archie Blyth&quot;</span>,
+                      school: <span class="st">&quot;Overworld AMP&quot;</span>)
+
+archie.languages = [<span class="st">&quot;Swift&quot;</span>, <span class="st">&quot;Python&quot;</span>, <span class="st">&quot;C#&quot;</span>]
+archie.focus     = .softwareDevelopment
+
+archie.projects.load()        <span class="cm">// 6 modules</span>
+archie.run()</script><script type="text/plain" class="ide-file" data-key="resell-logger"><span class="kw">class</span> <span class="ty">AppData</span>: <span class="ty">ObservableObject</span> {
+
+    <span class="kw">var</span> itemsInStock: <span class="ty">Int</span> {
+        sales.filter { !$<span class="nu">0</span>.isSold }.count
+    }
+
+    <span class="kw">var</span> inventoryValue: <span class="ty">Double</span> {
+        sales
+            .filter { !$<span class="nu">0</span>.isSold }
+            .reduce(<span class="nu">0</span>) { $<span class="nu">0</span> + $<span class="nu">1</span>.cost }
+    }
+
+    <span class="kw">var</span> soldItemsCount: <span class="ty">Int</span> {
+        sales.filter { $<span class="nu">0</span>.isSold }.count
+    }
+
+    <span class="kw">private</span> <span class="kw">let</span> db = <span class="ty">Firestore</span>.firestore()
+
+    <span class="kw">var</span> highestProfitSale: <span class="ty">Sale</span>? {
+        sales.max { $<span class="nu">0</span>.profit &lt; $<span class="nu">1</span>.profit }
+    }
+
+    <span class="kw">var</span> thisMonthProfit: <span class="ty">Double</span> {
+        <span class="kw">let</span> calendar = <span class="ty">Calendar</span>.current
+        <span class="kw">return</span> sales
+            .filter {
+                calendar.isDate($<span class="nu">0</span>.createdAt, equalTo: <span class="ty">Date</span>(),
+                                toGranularity: .month)
+            }
+            .reduce(<span class="nu">0</span>) { $<span class="nu">0</span> + $<span class="nu">1</span>.profit }
+    }
+}</script><script type="text/plain" class="ide-file" data-key="temperature-logger"><span class="kw">while</span> <span class="kw">True</span>:
+    <span class="kw">try</span>:
+        tempeture = <span class="kw">int</span>(<span class="kw">input</span>(<span class="st">&quot;please enter a temperature: &quot;</span>))
+
+        <span class="kw">if</span> tempeture == -<span class="nu">1</span>:
+            <span class="kw">break</span>
+
+        <span class="kw">if</span> (tempeture &gt;= <span class="nu">10</span>) <span class="kw">and</span> (tempeture &lt;= <span class="nu">50</span>):
+            validReading += <span class="nu">1</span>
+            totalTemp += tempeture
+        <span class="kw">else</span>:
+            <span class="kw">print</span>(<span class="st">&quot;temp must be within the range&quot;</span>)
+
+        <span class="kw">if</span> tempeture &lt;= <span class="ty">MIN_SAFE_TEMP</span>:
+            readingCount += <span class="nu">1</span>
+
+        <span class="kw">if</span> (tempeture &gt; highestTemp) <span class="kw">and</span> (tempeture &lt;= <span class="nu">50</span>):
+            highestTemp = tempeture
+
+        <span class="kw">if</span> (tempeture &lt; <span class="ty">LowestTemp</span>) <span class="kw">and</span> (tempeture &gt;= <span class="nu">10</span>):
+            <span class="ty">LowestTemp</span> = tempeture
+    <span class="kw">except</span> <span class="ty">ValueError</span>:
+        <span class="kw">print</span>(<span class="st">&quot;invalid temp must be a interger&quot;</span>)
+
+avrage = totalTemp / validReading
+
+<span class="kw">print</span>(f<span class="st">&quot;average temperature: {avrage}&quot;</span>)
+<span class="kw">print</span>(f<span class="st">&quot;highest temperature: {highestTemp}&quot;</span>)
+<span class="kw">print</span>(f<span class="st">&quot;lowest temperature: {LowestTemp}&quot;</span>)
+<span class="kw">print</span>(f<span class="st">&quot;under min count: {readingCount}&quot;</span>)
+<span class="kw">print</span>(f<span class="st">&quot;valid reading count: {validReading}&quot;</span>)</script><script type="text/plain" class="ide-file" data-key="coconut-shy"><span class="kw">void</span> <span class="ty">ChargeShot</span>()
+{
+    holdTime += <span class="ty">Time</span>.deltaTime;
+    <span class="kw">float</span> t = <span class="ty">Mathf</span>.<span class="ty">Clamp01</span>(holdTime / maxChargeTime);
+    <span class="kw">float</span> pullDistance = t * maxPullBack;
+    <span class="ty">Vector3</span> pullDirection = -<span class="ty">Camera</span>.main.transform.forward;
+    currentProjectile.transform.position =
+        launchPoint.position + pullDirection * pullDistance;
+}
+
+<span class="kw">void</span> <span class="ty">ReleaseShot</span>()
+{
+    isCharging = <span class="kw">false</span>;
+    <span class="kw">float</span> chargePercent = <span class="ty">Mathf</span>.<span class="ty">Clamp01</span>(holdTime / maxChargeTime);
+    <span class="kw">float</span> forceToApply = chargePercent * maxLaunchForce;
+    projectileRB.isKinematic = <span class="kw">false</span>;
+
+    <span class="ty">Vector3</span> launchDirection = <span class="ty">Physics</span>.<span class="ty">Raycast</span>(
+        <span class="ty">Camera</span>.main.transform.position, <span class="ty">Camera</span>.main.transform.forward,
+        <span class="kw">out</span> <span class="ty">RaycastHit</span> hitInfo)
+        ? launchPoint.position - hitInfo.point
+        : <span class="ty">Camera</span>.main.transform.forward;
+
+    projectileRB.<span class="ty">AddForce</span>(launchDirection.normalized * forceToApply,
+        <span class="ty">ForceMode</span>.<span class="ty">Impulse</span>);
+}</script>
+  <script type="application/json" id="build-log">[["hi","$ swift build archie.portfolio"],["","Compiling main.swift"],["ok","✓ ResellLogger · Swift, SwiftUI, Firebase Firestore"],["ok","✓ TemperatureLogger · Python, PyCharm, AS Computer Science"],["ok","✓ CoconutShy · C#, Unity 6, 3D physics"],["ok","✓ FlappyBird · C#, Unity 6, 2D"],["ok","✓ Dartboard, Automation in Ableton · assets"],["hi","Build succeeded in 0.42s · 0 warnings, 0 errors"],["em","Launching archie.portfolio…"]]</script>
+</div>
+<div id="site">
+<main id="main">
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <p class="hero-role">Student developer · Overworld AMP</p>
+        <h1>Archie<br>Blyth</h1>
+        <p class="lead">I like writing code. Swift and SwiftUI for iPhone apps, Python for problem-solving, and C# in Unity. Games are where some of that code gets tested; the code is the point.</p>
+        <div class="chips"><span class='chip chip-strong'>Swift</span><span class='chip chip-strong'>Python</span><span class='chip chip-strong'>C#</span><span class='chip'>SwiftUI</span><span class='chip'>Firebase</span><span class='chip'>Unity 6</span><span class='chip'>Blender</span><span class='chip'>Ableton Live</span></div>
+      </div>
+      <div class="stack" aria-label="Build summary"><div class="stack-head">archie.portfolio — build output</div><div class='stack-row'><span class="ok">✓</span> <b>ResellLogger</b><span>Swift · SwiftUI · Firebase Firestore</span></div><div class='stack-row'><span class="ok">✓</span> <b>TemperatureLogger</b><span>Python · PyCharm · AS Computer Science</span></div><div class='stack-row'><span class="ok">✓</span> <b>CoconutShy</b><span>C# · Unity 6 · 3D physics</span></div><div class='stack-row'><span class="ok">✓</span> <b>FlappyBird</b><span>C# · Unity 6 · 2D</span></div><div class='stack-row'><span class="ok">✓</span> <b>Dartboard</b><span>Blender · Substance 3D Painter</span></div><div class='stack-row'><span class="ok">✓</span> <b>AutomationInAbleton</b><span>Ableton Live</span></div><div class="stack-foot">0 warnings · 0 errors · hover a project to read its source</div></div>
+    </div>
+  </header>
+
+  <section id="projects" class="wrap projects">
+    <h2>Projects</h2>
+    <p class="section-lead">6 pieces of work. Every coding project shows a real excerpt from its source.</p>
+    <h3 class="group-label">Apps<span>Shipped software, with a database behind it.</span></h3>
+<a class="card mod card-wide" href="projects/resell-logger.html">
+  <div class="face front">
+    <span class="card-media"><img class="card-img" src="assets/reselllogger-thumb.png" alt="" width="2160" height="900" loading="lazy" decoding="async"><video class="card-video" muted loop playsinline preload="none" data-src="assets/reselllogger-demo.mp4" aria-hidden="true" tabindex="-1"></video></span>
+    <div class="card-body">
+      <span class="lang lang-swift">Swift</span>
+      <h3>Resell Logger</h3>
+      <p>An iPhone app for tracking resale stock and profit: add items with a photo, mark them sold, and see turnover, profit, best sellers and a sales calendar.</p>
+      <span class="hint">↻ hover to read the code</span>
+    </div>
+  </div>
+  <div class="face back" aria-hidden="true"><div class="file">dataManager.swift</div><pre class="code"><span class="kw">class</span> <span class="ty">AppData</span>: <span class="ty">ObservableObject</span> {
+
+    <span class="kw">var</span> itemsInStock: <span class="ty">Int</span> {
+        sales.filter { !$<span class="nu">0</span>.isSold }.count
+    }
+
+    <span class="kw">var</span> inventoryValue: <span class="ty">Double</span> {
+        sales
+            .filter { !$<span class="nu">0</span>.isSold }
+            .reduce(<span class="nu">0</span>) { $<span class="nu">0</span> + $<span class="nu">1</span>.cost }
+    }
+</pre><span class="open">open project →</span></div>
+</a><h3 class="group-label">Python<span>Course work that reads like production code.</span></h3>
+<a class="card mod card-wide" href="projects/temperature-logger.html">
+  <div class="face front">
+    <span class="card-media"><img class="card-img" src="assets/python-temp-code.png" alt="" width="1280" height="833" loading="lazy" decoding="async"><video class="card-video" muted loop playsinline preload="none" data-src="assets/python-temp-demo.mp4" aria-hidden="true" tabindex="-1"></video></span>
+    <div class="card-body">
+      <span class="lang lang-python">Python</span>
+      <h3>Temperature Logger</h3>
+      <p>A console program that takes temperature readings in a loop, validates each one, and reports the average, highest, lowest and how many fell below a safe minimum.</p>
+      <span class="hint">↻ hover to read the code</span>
+    </div>
+  </div>
+  <div class="face back" aria-hidden="true"><div class="file">temp.py</div><pre class="code"><span class="kw">while</span> <span class="kw">True</span>:
+    <span class="kw">try</span>:
+        tempeture = <span class="kw">int</span>(<span class="kw">input</span>(<span class="st">&quot;please enter a temperature: &quot;</span>))
+
+        <span class="kw">if</span> tempeture == -<span class="nu">1</span>:
+            <span class="kw">break</span>
+
+        <span class="kw">if</span> (tempeture &gt;= <span class="nu">10</span>) <span class="kw">and</span> (tempeture &lt;= <span class="nu">50</span>):
+            validReading += <span class="nu">1</span>
+            totalTemp += tempeture
+        <span class="kw">else</span>:
+            <span class="kw">print</span>(<span class="st">&quot;temp must be within the range&quot;</span>)</pre><span class="open">open project →</span></div>
+</a><h3 class="group-label">C# in Unity<span>Game projects, presented for the code.</span></h3><div class="grid">
+<a class="card mod" href="projects/coconut-shy.html">
+  <div class="face front">
+    <span class="card-media"><img class="card-img" src="assets/coconutshy-editor.png" alt="" width="1917" height="1005" loading="lazy" decoding="async"><video class="card-video" muted loop playsinline preload="none" data-src="assets/coconutshy-gameplay-web.mp4" aria-hidden="true" tabindex="-1"></video></span>
+    <div class="card-body">
+      <span class="lang lang-csharp">C#</span>
+      <h3>Coconut Shy</h3>
+      <p>18 custom C# scripts driving a 3D slingshot game: charge-and-release physics, raycast aiming, enemy AI, timers, score and a full menu flow. The biggest codebase in the portfolio.</p>
+      <span class="hint">↻ hover to read the code</span>
+    </div>
+  </div>
+  <div class="face back" aria-hidden="true"><div class="file">Slingshot.cs</div><pre class="code"><span class="kw">void</span> <span class="ty">ChargeShot</span>()
+{
+    holdTime += <span class="ty">Time</span>.deltaTime;
+    <span class="kw">float</span> t = <span class="ty">Mathf</span>.<span class="ty">Clamp01</span>(holdTime / maxChargeTime);
+    <span class="kw">float</span> pullDistance = t * maxPullBack;
+    <span class="ty">Vector3</span> pullDirection = -<span class="ty">Camera</span>.main.transform.forward;
+    currentProjectile.transform.position =
+        launchPoint.position + pullDirection * pullDistance;
+}
+
+<span class="kw">void</span> <span class="ty">ReleaseShot</span>()
+{</pre><span class="open">open project →</span></div>
+</a>
+<a class="card mod" href="projects/flappy-bird.html">
+  <div class="face front">
+    <span class="card-media"><img class="card-img" src="assets/flappybird-editor.png" alt="" width="1918" height="1030" loading="lazy" decoding="async"><video class="card-video" muted loop playsinline preload="none" data-src="assets/flappybird-gameplay-web.mp4" aria-hidden="true" tabindex="-1"></video></span>
+    <div class="card-body">
+      <span class="lang lang-csharp">C#</span>
+      <h3>Flappy Bird</h3>
+      <p>C# game logic in Unity: a timer-driven procedural spawner, frame-rate-independent movement, trigger-collider scoring and state handling, plus a second controller for two-player mode.</p>
+      <span class="hint">↻ hover to read the code</span>
+    </div>
+  </div>
+  <div class="face back" aria-hidden="true"><div class="file">GameManager.cs</div><pre class="code"><span class="kw">void</span> <span class="ty">Update</span>()
+{
+    spawnTimeSeconds -= <span class="ty">Time</span>.deltaTime;
+
+    <span class="kw">if</span> (spawnTimeSeconds &lt; <span class="nu">0</span>)
+    {
+        spawnTimeSeconds = spawnTime;
+        <span class="kw">float</span> yOffset = <span class="ty">Random</span>.<span class="ty">Range</span>(minYPosition, maxYPosition);
+        spawnPostion.y = yOffset;
+        <span class="ty">Instantiate</span>(pipes, spawnPostion, <span class="ty">Quaternion</span>.identity);
+    }
+}</pre><span class="open">open project →</span></div>
+</a></div><h3 class="group-label">3D and music<span>Work outside code.</span></h3><div class="grid">
+<a class="card" href="projects/dartboard.html">
+  <img class="card-img" src="assets/dartboard-textured.png" alt="" width="1915" height="1022" loading="lazy" decoding="async">
+  <div class="card-body">
+    <span class="lang">Blender</span>
+    <h3>Dartboard — game-ready asset</h3>
+    <p>A dartboard prop modelled from reference in Blender and textured in Substance 3D Painter with layered PBR materials at 2048×2048.</p>
+  </div>
+</a>
+<a class="card" href="projects/ableton-automation.html">
+  <img class="card-img" src="assets/ableton-automation-thumb.jpg" alt="" width="1280" height="844" loading="lazy" decoding="async">
+  <div class="card-body">
+    <span class="lang">Ableton Live</span>
+    <h3>Automation in Ableton</h3>
+    <p>Drawing parameter automation to shape volume, filters and effects over time, giving a track movement and dynamics.</p>
+  </div>
+</a></div>
+  </section>
+
+  <section id="about" class="wrap about">
+    <h2>About</h2>
+    <div class="about-box"><p>Archie Blyth is a student developer whose main interest is code. He builds iPhone apps in Swift and SwiftUI with a Firebase backend, writes Python for his AS Level Computer Science course, and uses C# in Unity, where his Game Design coursework gave him a place to practise algorithms, physics maths and game-loop logic.</p><p>His focus is software development rather than game design: the projects here are chosen to show how he structures code, handles data and solves problems. Alongside that he has modelled assets in Blender and Substance 3D Painter and produced music in Ableton Live.</p></div>
+  </section>
+</main>
+
+<div class="cli" aria-label="Command line">
+  <div class="wrap">
+    <span class="prompt">archie@portfolio:~$</span>
+    <input id="cmd" type="text" placeholder="try: ls, open coconut, help…" autocomplete="off" spellcheck="false" aria-label="Command">
+    <span class="reply" id="reply"></span>
+  </div>
+</div>
+<footer class="foot">
+  <div class="wrap">
+    
+    <p><button type="button" id="replay" class="replay">↻ replay intro</button> · Archie Blyth — Overworld AMP 2026</p>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.querySelector('.theme'); if(!b) return;
+  function cur(){ var a=document.documentElement.getAttribute('data-theme'); if(a) return a;
+    return window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'; }
+  b.addEventListener('click',function(){ var n=cur()==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',n); try{localStorage.setItem('archie-theme',n);}catch(e){} });
+})();
+// --- intro (index only), hover previews, reading progress, command line ---
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var boot = document.getElementById('boot'), site = document.getElementById('site');
+  if (boot) {
+    var editor = document.getElementById('editor'), out = document.getElementById('out'), run = document.getElementById('run'), status = document.getElementById('status');
+    var FILES = {}; document.querySelectorAll('.ide-file').forEach(function(f){ FILES[f.getAttribute('data-key')] = f.textContent; });
+    var BUILD = JSON.parse(document.getElementById('build-log').textContent);
+    var timers = []; function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
+    function render(key, animate){
+      clearTimers();
+      var lines = FILES[key].split('\n');
+      editor.innerHTML = lines.map(function(l,i){ return '<div class="ln"><span>'+(i+1)+'</span><span>'+(l||'&nbsp;')+'</span></div>'; }).join('') + '<div class="ln"><span></span><span><span class="caret"></span></span></div>';
+      var els = editor.querySelectorAll('.ln');
+      if (animate && !reduce) {
+        editor.classList.add('typing');
+        els.forEach(function(l,i){ timers.push(setTimeout(function(){ l.classList.add('show'); }, 200 + i*55)); });
+        timers.push(setTimeout(function(){ editor.classList.remove('typing'); run.disabled = false; run.classList.add('ready'); status.textContent = 'ready'; }, 200 + els.length*55 + 120));
+      } else { editor.classList.remove('typing'); run.disabled = false; status.textContent = 'ready'; }
+    }
+    document.querySelectorAll('.tab').forEach(function(t){ t.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(x){ x.setAttribute('aria-selected','false'); }); t.setAttribute('aria-selected','true'); render(t.getAttribute('data-tab'), false); }); });
+    var launched = false;
+    function launch(){ boot.classList.add('leaving'); site.classList.add('on'); document.body.classList.add('ran'); try{localStorage.setItem('archie-intro-seen','1');}catch(e){} setTimeout(function(){ boot.classList.add('gone'); }, reduce ? 0 : 900); }
+    function doRun(){
+      if (launched || run.disabled) return; launched = true; run.disabled = true; status.textContent = 'building'; out.innerHTML = '';
+      var delay = 0, step = reduce ? 0 : 130;
+      BUILD.forEach(function(b){ var el = document.createElement('span'); el.className = 'line ' + b[0]; el.textContent = b[1]; out.appendChild(el); out.appendChild(document.createTextNode('\n')); delay += step; setTimeout(function(){ el.classList.add('show'); }, delay); });
+      setTimeout(function(){ status.textContent = 'running'; launch(); }, delay + (reduce ? 0 : 350));
+    }
+    run.addEventListener('click', doRun);
+    document.getElementById('skip').addEventListener('click', function(){ clearTimers(); launch(); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Enter' && !boot.classList.contains('gone') && document.activeElement.id !== 'cmd') doRun(); });
+    var seen = false; try { seen = localStorage.getItem('archie-intro-seen') === '1'; } catch(e){}
+    if (/[?&#]intro/.test(location.search + location.hash)) { seen = false; }
+    if (seen || reduce) { boot.classList.add('gone'); site.classList.add('on'); document.body.classList.add('ran'); } else { render('main', true); }
+    var rp = document.getElementById('replay'); if (rp) rp.addEventListener('click', function(){ try{localStorage.removeItem('archie-intro-seen');}catch(e){} location.reload(); });
+  } else if (site) { site.classList.add('on'); }
+  // command line
+  var cmd = document.getElementById('cmd'), reply = document.getElementById('reply');
+  if (cmd) {
+    var root = location.pathname.indexOf('/projects/') > -1 ? '../' : '';
+    var MODS = {"resell-logger":"Resell Logger","temperature-logger":"Temperature Logger","coconut-shy":"Coconut Shy","flappy-bird":"Flappy Bird","dartboard":"Dartboard — game-ready asset","ableton-automation":"Automation in Ableton"};
+    cmd.addEventListener('keydown', function(e){
+      if (e.key !== 'Enter') return; var v = cmd.value.trim().toLowerCase(); cmd.value = ''; if (!v) return;
+      if (v === 'help') reply.textContent = 'ls · open <project> · replay · home · about · theme light|dark · clear';
+      else if (v === 'replay' || v === 'intro' || v === 'run' || v === 'reboot') { reply.textContent = 'rebooting…'; try{localStorage.removeItem('archie-intro-seen');}catch(e){} location.href = root + 'index.html?intro'; }
+      else if (v === 'ls') reply.textContent = Object.keys(MODS).join('  ');
+      else if (v === 'home') location.href = root + 'index.html';
+      else if (v === 'about') location.href = root + 'index.html#about';
+      else if (v === 'clear') reply.textContent = '';
+      else if (v === 'theme light' || v === 'theme dark') { var n = v.split(' ')[1]; document.documentElement.setAttribute('data-theme', n); try{localStorage.setItem('archie-theme', n);}catch(e){} reply.textContent = 'theme → ' + n; }
+      else if (v.indexOf('open ') === 0) { var q = v.slice(5).trim(); var hit = Object.keys(MODS).filter(function(k){ return k.indexOf(q) === 0 || k.indexOf(q.replace(/ +/g,'-')) > -1; })[0]; if (hit) { reply.textContent = 'opening ' + MODS[hit] + '…'; location.href = root + 'projects/' + hit + '.html'; } else reply.textContent = 'no such project: ' + q; }
+      else if (v === 'sudo make me a sandwich') reply.textContent = 'okay.';
+      else reply.textContent = v + ': command not found — try help';
+    });
+  }
+  var fine = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (fine && !reduce) {
+    document.querySelectorAll('.card-media').forEach(function(m){
+      var v = m.querySelector('video'); if (!v) return;
+      m.closest('.card').addEventListener('mouseenter', function(){ if (!v.src) v.src = v.getAttribute('data-src'); v.currentTime = 0; v.play().catch(function(){}); m.classList.add('playing'); });
+      m.closest('.card').addEventListener('mouseleave', function(){ v.pause(); m.classList.remove('playing'); });
+    });
+  }
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function(){ var h = document.documentElement; var max = h.scrollHeight - h.clientHeight; bar.style.transform = 'scaleX(' + (max > 0 ? h.scrollTop / max : 0) + ')'; };
+    addEventListener('scroll', tick, {passive:true}); tick();
+  }
+})();
+</script>
+</body>
+</html>
+</div>

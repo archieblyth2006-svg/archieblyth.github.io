@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coconut Shy — Archie Blyth</title>
+<meta name="description" content="18 custom C# scripts driving a 3D slingshot game: charge-and-release physics, raycast aiming, enemy AI, timers, score and a full menu flow. The biggest codebase in the portfolio.">
+<meta property="og:title" content="Coconut Shy — Archie Blyth">
+<meta property="og:description" content="18 custom C# scripts driving a 3D slingshot game: charge-and-release physics, raycast aiming, enemy AI, timers, score and a full menu flow. The biggest codebase in the portfolio.">
+<meta name="theme-color" content="#0c0911" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#faf7fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 32 32&quot;&gt;&lt;rect width=&quot;32&quot; height=&quot;32&quot; rx=&quot;6&quot; fill=&quot;#0c0911&quot;/&gt;&lt;path d=&quot;M9 11 4 16l5 5M23 11l5 5-5 5M19 8l-6 16&quot; fill=&quot;none&quot; stroke=&quot;#cb63ee&quot; stroke-width=&quot;2.6&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/&gt;&lt;/svg&gt;">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Sora:wght@700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<script>try{var t=localStorage.getItem("archie-theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<nav class="nav" aria-label="Site">
+  <span class="progress" aria-hidden="true"></span>
+  <div class="wrap">
+    <a class="brand" href="../index.html">archie.blyth</a>
+    <div class="nav-links">
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#about">About</a>
+      <button class="theme" type="button" aria-label="Switch between light and dark theme" title="Light / dark">
+        <span class="theme-sun" aria-hidden="true"></span><span class="theme-moon" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <header class="proj-head">
+    <a class="back" href="../index.html#projects">All projects</a>
+    <p class="proj-group">C# in Unity</p>
+    <h1>Coconut Shy</h1>
+    <p class="lead">18 custom C# scripts driving a 3D slingshot game: charge-and-release physics, raycast aiming, enemy AI, timers, score and a full menu flow. The biggest codebase in the portfolio.</p>
+    <div class="chips"><span class='chip'>C#</span><span class='chip'>Unity 6</span><span class='chip'>3D physics</span></div>
+  </header>
+
+  <section>
+    <h2>Demo</h2>
+    <video class="media" src="../assets/coconutshy-gameplay-web.mp4" poster="../assets/coconutshy-gameplay-web-poster.jpg" controls preload="none" playsinline></video>
+  </section>
+  <section>
+    <h2>How it works</h2><p>A 3D fairground slingshot game. Hold the mouse to charge, release to launch a projectile at pop-up targets scattered across the field, with moving targets, enemies, a countdown timer and score tracking.</p><p>Custom C# scripts cover the whole loop: a Slingshot controller with hold-to-charge launching, physics projectiles, pop-up and moving targets, an enemy spawner with follow behaviour, a countdown timer, score management, respawning, and full menu, pause and end-game UI.</p><p>The game is the wrapper; the interesting part is the maths and the structure of the code behind it.</p></section>
+  <section>
+    <h2>Featured code</h2>
+    <figure class="codefig">
+      <figcaption>Slingshot.cs — charge, aim, release</figcaption>
+      <pre class="code" tabindex="0"><code><span class="kw">void</span> <span class="ty">ChargeShot</span>()
+{
+    holdTime += <span class="ty">Time</span>.deltaTime;
+    <span class="kw">float</span> t = <span class="ty">Mathf</span>.<span class="ty">Clamp01</span>(holdTime / maxChargeTime);
+    <span class="kw">float</span> pullDistance = t * maxPullBack;
+    <span class="ty">Vector3</span> pullDirection = -<span class="ty">Camera</span>.main.transform.forward;
+    currentProjectile.transform.position =
+        launchPoint.position + pullDirection * pullDistance;
+}
+
+<span class="kw">void</span> <span class="ty">ReleaseShot</span>()
+{
+    isCharging = <span class="kw">false</span>;
+    <span class="kw">float</span> chargePercent = <span class="ty">Mathf</span>.<span class="ty">Clamp01</span>(holdTime / maxChargeTime);
+    <span class="kw">float</span> forceToApply = chargePercent * maxLaunchForce;
+    projectileRB.isKinematic = <span class="kw">false</span>;
+
+    <span class="ty">Vector3</span> launchDirection = <span class="ty">Physics</span>.<span class="ty">Raycast</span>(
+        <span class="ty">Camera</span>.main.transform.position, <span class="ty">Camera</span>.main.transform.forward,
+        <span class="kw">out</span> <span class="ty">RaycastHit</span> hitInfo)
+        ? launchPoint.position - hitInfo.point
+        : <span class="ty">Camera</span>.main.transform.forward;
+
+    projectileRB.<span class="ty">AddForce</span>(launchDirection.normalized * forceToApply,
+        <span class="ty">ForceMode</span>.<span class="ty">Impulse</span>);
+}</code></pre>
+    </figure>
+    <p>Holding the mouse charges the shot over time and pulls the projectile back from the launch point. On release, charge percentage becomes an impulse force, aimed with a raycast from the camera. Normalising hold time with Mathf.Clamp01, scaling force by charge percentage and vector maths for aim direction: the Algorithms &amp; Coding unit in action.</p>
+  </section><section><h2>In the editor</h2><div class="media-grid"><figure><img class="media" src="../assets/coconutshy-editor.png" alt="The scene in Unity: target field, slingshot rig and the project’s script library." width="1917" height="1005" loading="lazy" decoding="async"><figcaption>The scene in Unity: target field, slingshot rig and the project’s script library.</figcaption></figure></div></section></main>
+<div class="cli" aria-label="Command line">
+  <div class="wrap">
+    <span class="prompt">archie@portfolio:~$</span>
+    <input id="cmd" type="text" placeholder="try: ls, open coconut, help…" autocomplete="off" spellcheck="false" aria-label="Command">
+    <span class="reply" id="reply"></span>
+  </div>
+</div>
+<footer class="foot">
+  <div class="wrap">
+    <nav class="pager" aria-label="Project navigation"><a href="../projects/temperature-logger.html" rel="prev">Previous: Temperature Logger</a><a href="../projects/flappy-bird.html" rel="next">Next: Flappy Bird</a></nav>
+    <p>Archie Blyth — Overworld AMP 2026</p>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.querySelector('.theme'); if(!b) return;
+  function cur(){ var a=document.documentElement.getAttribute('data-theme'); if(a) return a;
+    return window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'; }
+  b.addEventListener('click',function(){ var n=cur()==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',n); try{localStorage.setItem('archie-theme',n);}catch(e){} });
+})();
+// --- intro (index only), hover previews, reading progress, command line ---
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var boot = document.getElementById('boot'), site = document.getElementById('site');
+  if (boot) {
+    var editor = document.getElementById('editor'), out = document.getElementById('out'), run = document.getElementById('run'), status = document.getElementById('status');
+    var FILES = {}; document.querySelectorAll('.ide-file').forEach(function(f){ FILES[f.getAttribute('data-key')] = f.textContent; });
+    var BUILD = JSON.parse(document.getElementById('build-log').textContent);
+    var timers = []; function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
+    function render(key, animate){
+      clearTimers();
+      var lines = FILES[key].split('\n');
+      editor.innerHTML = lines.map(function(l,i){ return '<div class="ln"><span>'+(i+1)+'</span><span>'+(l||'&nbsp;')+'</span></div>'; }).join('') + '<div class="ln"><span></span><span><span class="caret"></span></span></div>';
+      var els = editor.querySelectorAll('.ln');
+      if (animate && !reduce) {
+        editor.classList.add('typing');
+        els.forEach(function(l,i){ timers.push(setTimeout(function(){ l.classList.add('show'); }, 200 + i*55)); });
+        timers.push(setTimeout(function(){ editor.classList.remove('typing'); run.disabled = false; run.classList.add('ready'); status.textContent = 'ready'; }, 200 + els.length*55 + 120));
+      } else { editor.classList.remove('typing'); run.disabled = false; status.textContent = 'ready'; }
+    }
+    document.querySelectorAll('.tab').forEach(function(t){ t.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(x){ x.setAttribute('aria-selected','false'); }); t.setAttribute('aria-selected','true'); render(t.getAttribute('data-tab'), false); }); });
+    var launched = false;
+    function launch(){ boot.classList.add('leaving'); site.classList.add('on'); document.body.classList.add('ran'); try{localStorage.setItem('archie-intro-seen','1');}catch(e){} setTimeout(function(){ boot.classList.add('gone'); }, reduce ? 0 : 900); }
+    function doRun(){
+      if (launched || run.disabled) return; launched = true; run.disabled = true; status.textContent = 'building'; out.innerHTML = '';
+      var delay = 0, step = reduce ? 0 : 130;
+      BUILD.forEach(function(b){ var el = document.createElement('span'); el.className = 'line ' + b[0]; el.textContent = b[1]; out.appendChild(el); out.appendChild(document.createTextNode('\n')); delay += step; setTimeout(function(){ el.classList.add('show'); }, delay); });
+      setTimeout(function(){ status.textContent = 'running'; launch(); }, delay + (reduce ? 0 : 350));
+    }
+    run.addEventListener('click', doRun);
+    document.getElementById('skip').addEventListener('click', function(){ clearTimers(); launch(); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Enter' && !boot.classList.contains('gone') && document.activeElement.id !== 'cmd') doRun(); });
+    var seen = false; try { seen = localStorage.getItem('archie-intro-seen') === '1'; } catch(e){}
+    if (/[?&#]intro/.test(location.search + location.hash)) { seen = false; }
+    if (seen || reduce) { boot.classList.add('gone'); site.classList.add('on'); document.body.classList.add('ran'); } else { render('main', true); }
+    var rp = document.getElementById('replay'); if (rp) rp.addEventListener('click', function(){ try{localStorage.removeItem('archie-intro-seen');}catch(e){} location.reload(); });
+  } else if (site) { site.classList.add('on'); }
+  // command line
+  var cmd = document.getElementById('cmd'), reply = document.getElementById('reply');
+  if (cmd) {
+    var root = location.pathname.indexOf('/projects/') > -1 ? '../' : '';
+    var MODS = {"resell-logger":"Resell Logger","temperature-logger":"Temperature Logger","coconut-shy":"Coconut Shy","flappy-bird":"Flappy Bird","dartboard":"Dartboard — game-ready asset","ableton-automation":"Automation in Ableton"};
+    cmd.addEventListener('keydown', function(e){
+      if (e.key !== 'Enter') return; var v = cmd.value.trim().toLowerCase(); cmd.value = ''; if (!v) return;
+      if (v === 'help') reply.textContent = 'ls · open <project> · replay · home · about · theme light|dark · clear';
+      else if (v === 'replay' || v === 'intro' || v === 'run' || v === 'reboot') { reply.textContent = 'rebooting…'; try{localStorage.removeItem('archie-intro-seen');}catch(e){} location.href = root + 'index.html?intro'; }
+      else if (v === 'ls') reply.textContent = Object.keys(MODS).join('  ');
+      else if (v === 'home') location.href = root + 'index.html';
+      else if (v === 'about') location.href = root + 'index.html#about';
+      else if (v === 'clear') reply.textContent = '';
+      else if (v === 'theme light' || v === 'theme dark') { var n = v.split(' ')[1]; document.documentElement.setAttribute('data-theme', n); try{localStorage.setItem('archie-theme', n);}catch(e){} reply.textContent = 'theme → ' + n; }
+      else if (v.indexOf('open ') === 0) { var q = v.slice(5).trim(); var hit = Object.keys(MODS).filter(function(k){ return k.indexOf(q) === 0 || k.indexOf(q.replace(/ +/g,'-')) > -1; })[0]; if (hit) { reply.textContent = 'opening ' + MODS[hit] + '…'; location.href = root + 'projects/' + hit + '.html'; } else reply.textContent = 'no such project: ' + q; }
+      else if (v === 'sudo make me a sandwich') reply.textContent = 'okay.';
+      else reply.textContent = v + ': command not found — try help';
+    });
+  }
+  var fine = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (fine && !reduce) {
+    document.querySelectorAll('.card-media').forEach(function(m){
+      var v = m.querySelector('video'); if (!v) return;
+      m.closest('.card').addEventListener('mouseenter', function(){ if (!v.src) v.src = v.getAttribute('data-src'); v.currentTime = 0; v.play().catch(function(){}); m.classList.add('playing'); });
+      m.closest('.card').addEventListener('mouseleave', function(){ v.pause(); m.classList.remove('playing'); });
+    });
+  }
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function(){ var h = document.documentElement; var max = h.scrollHeight - h.clientHeight; bar.style.transform = 'scaleX(' + (max > 0 ? h.scrollTop / max : 0) + ')'; };
+    addEventListener('scroll', tick, {passive:true}); tick();
+  }
+})();
+</script>
+</body>
+</html>

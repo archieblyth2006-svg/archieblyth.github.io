@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flappy Bird — Archie Blyth</title>
+<meta name="description" content="C# game logic in Unity: a timer-driven procedural spawner, frame-rate-independent movement, trigger-collider scoring and state handling, plus a second controller for two-player mode.">
+<meta property="og:title" content="Flappy Bird — Archie Blyth">
+<meta property="og:description" content="C# game logic in Unity: a timer-driven procedural spawner, frame-rate-independent movement, trigger-collider scoring and state handling, plus a second controller for two-player mode.">
+<meta name="theme-color" content="#0c0911" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#faf7fc" media="(prefers-color-scheme: light)">
+<link rel="icon" href="data:image/svg+xml,&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 32 32&quot;&gt;&lt;rect width=&quot;32&quot; height=&quot;32&quot; rx=&quot;6&quot; fill=&quot;#0c0911&quot;/&gt;&lt;path d=&quot;M9 11 4 16l5 5M23 11l5 5-5 5M19 8l-6 16&quot; fill=&quot;none&quot; stroke=&quot;#cb63ee&quot; stroke-width=&quot;2.6&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/&gt;&lt;/svg&gt;">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Sora:wght@700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<script>try{var t=localStorage.getItem("archie-theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<nav class="nav" aria-label="Site">
+  <span class="progress" aria-hidden="true"></span>
+  <div class="wrap">
+    <a class="brand" href="../index.html">archie.blyth</a>
+    <div class="nav-links">
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#about">About</a>
+      <button class="theme" type="button" aria-label="Switch between light and dark theme" title="Light / dark">
+        <span class="theme-sun" aria-hidden="true"></span><span class="theme-moon" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <header class="proj-head">
+    <a class="back" href="../index.html#projects">All projects</a>
+    <p class="proj-group">C# in Unity</p>
+    <h1>Flappy Bird</h1>
+    <p class="lead">C# game logic in Unity: a timer-driven procedural spawner, frame-rate-independent movement, trigger-collider scoring and state handling, plus a second controller for two-player mode.</p>
+    <div class="chips"><span class='chip'>C#</span><span class='chip'>Unity 6</span><span class='chip'>2D</span></div>
+  </header>
+
+  <section>
+    <h2>Demo</h2>
+    <video class="media" src="../assets/flappybird-gameplay-web.mp4" poster="../assets/flappybird-gameplay-web-poster.jpg" controls preload="none" playsinline></video>
+  </section>
+  <section>
+    <h2>How it works</h2><p>A GameManager spawns pipe prefabs on a timer at a random height, pipes scroll left with frame-rate-independent movement, and trigger colliders handle scoring, cleanup and collisions. The bird applies constant drop speed with an instant jump on input, and freezes time on game over. A second bird script adds two-player racing on a separate input.</p></section>
+  <section>
+    <h2>Featured code</h2>
+    <figure class="codefig">
+      <figcaption>GameManager.cs — procedural pipe spawner</figcaption>
+      <pre class="code" tabindex="0"><code><span class="kw">void</span> <span class="ty">Update</span>()
+{
+    spawnTimeSeconds -= <span class="ty">Time</span>.deltaTime;
+
+    <span class="kw">if</span> (spawnTimeSeconds &lt; <span class="nu">0</span>)
+    {
+        spawnTimeSeconds = spawnTime;
+        <span class="kw">float</span> yOffset = <span class="ty">Random</span>.<span class="ty">Range</span>(minYPosition, maxYPosition);
+        spawnPostion.y = yOffset;
+        <span class="ty">Instantiate</span>(pipes, spawnPostion, <span class="ty">Quaternion</span>.identity);
+    }
+}
+
+<span class="kw">private</span> <span class="kw">void</span> <span class="ty">OnTriggerEnter2D</span>(<span class="ty">Collider2D</span> collision)
+{
+    <span class="kw">if</span> (collision.gameObject.<span class="ty">CompareTag</span>(<span class="st">&quot;obstical&quot;</span>))
+    {
+        <span class="ty">Score</span> += <span class="nu">0.5f</span>;
+        displayScore = <span class="ty">Mathf</span>.<span class="ty">FloorToInt</span>(<span class="ty">Score</span>);
+        <span class="ty">ScoreText</span>.text = <span class="st">&quot;Score: &quot;</span> + displayScore;
+        <span class="ty">Addpoint</span>.<span class="ty">Play</span>();
+    }
+}</code></pre>
+    </figure>
+    <p>Pipes spawn at a random Y each cycle so every run is different; Time.deltaTime keeps the countdown consistent at any frame rate. Scoring uses trigger colliders between pipe pairs: each gate adds 0.5, floored for display, and hitting the target score activates the finish line.</p>
+  </section><section><h2>In the editor</h2><div class="media-grid"><figure><img class="media" src="../assets/flappybird-editor.png" alt="The scene in Unity 6: bird, pipe spawner, borders and UI canvas." width="1918" height="1030" loading="lazy" decoding="async"><figcaption>The scene in Unity 6: bird, pipe spawner, borders and UI canvas.</figcaption></figure></div></section></main>
+<div class="cli" aria-label="Command line">
+  <div class="wrap">
+    <span class="prompt">archie@portfolio:~$</span>
+    <input id="cmd" type="text" placeholder="try: ls, open coconut, help…" autocomplete="off" spellcheck="false" aria-label="Command">
+    <span class="reply" id="reply"></span>
+  </div>
+</div>
+<footer class="foot">
+  <div class="wrap">
+    <nav class="pager" aria-label="Project navigation"><a href="../projects/coconut-shy.html" rel="prev">Previous: Coconut Shy</a><a href="../projects/dartboard.html" rel="next">Next: Dartboard — game-ready asset</a></nav>
+    <p>Archie Blyth — Overworld AMP 2026</p>
+  </div>
+</footer>
+<script>
+(function(){
+  var b=document.querySelector('.theme'); if(!b) return;
+  function cur(){ var a=document.documentElement.getAttribute('data-theme'); if(a) return a;
+    return window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'; }
+  b.addEventListener('click',function(){ var n=cur()==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',n); try{localStorage.setItem('archie-theme',n);}catch(e){} });
+})();
+// --- intro (index only), hover previews, reading progress, command line ---
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var boot = document.getElementById('boot'), site = document.getElementById('site');
+  if (boot) {
+    var editor = document.getElementById('editor'), out = document.getElementById('out'), run = document.getElementById('run'), status = document.getElementById('status');
+    var FILES = {}; document.querySelectorAll('.ide-file').forEach(function(f){ FILES[f.getAttribute('data-key')] = f.textContent; });
+    var BUILD = JSON.parse(document.getElementById('build-log').textContent);
+    var timers = []; function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
+    function render(key, animate){
+      clearTimers();
+      var lines = FILES[key].split('\n');
+      editor.innerHTML = lines.map(function(l,i){ return '<div class="ln"><span>'+(i+1)+'</span><span>'+(l||'&nbsp;')+'</span></div>'; }).join('') + '<div class="ln"><span></span><span><span class="caret"></span></span></div>';
+      var els = editor.querySelectorAll('.ln');
+      if (animate && !reduce) {
+        editor.classList.add('typing');
+        els.forEach(function(l,i){ timers.push(setTimeout(function(){ l.classList.add('show'); }, 200 + i*55)); });
+        timers.push(setTimeout(function(){ editor.classList.remove('typing'); run.disabled = false; run.classList.add('ready'); status.textContent = 'ready'; }, 200 + els.length*55 + 120));
+      } else { editor.classList.remove('typing'); run.disabled = false; status.textContent = 'ready'; }
+    }
+    document.querySelectorAll('.tab').forEach(function(t){ t.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(x){ x.setAttribute('aria-selected','false'); }); t.setAttribute('aria-selected','true'); render(t.getAttribute('data-tab'), false); }); });
+    var launched = false;
+    function launch(){ boot.classList.add('leaving'); site.classList.add('on'); document.body.classList.add('ran'); try{localStorage.setItem('archie-intro-seen','1');}catch(e){} setTimeout(function(){ boot.classList.add('gone'); }, reduce ? 0 : 900); }
+    function doRun(){
+      if (launched || run.disabled) return; launched = true; run.disabled = true; status.textContent = 'building'; out.innerHTML = '';
+      var delay = 0, step = reduce ? 0 : 130;
+      BUILD.forEach(function(b){ var el = document.createElement('span'); el.className = 'line ' + b[0]; el.textContent = b[1]; out.appendChild(el); out.appendChild(document.createTextNode('\n')); delay += step; setTimeout(function(){ el.classList.add('show'); }, delay); });
+      setTimeout(function(){ status.textContent = 'running'; launch(); }, delay + (reduce ? 0 : 350));
+    }
+    run.addEventListener('click', doRun);
+    document.getElementById('skip').addEventListener('click', function(){ clearTimers(); launch(); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Enter' && !boot.classList.contains('gone') && document.activeElement.id !== 'cmd') doRun(); });
+    var seen = false; try { seen = localStorage.getItem('archie-intro-seen') === '1'; } catch(e){}
+    if (/[?&#]intro/.test(location.search + location.hash)) { seen = false; }
+    if (seen || reduce) { boot.classList.add('gone'); site.classList.add('on'); document.body.classList.add('ran'); } else { render('main', true); }
+    var rp = document.getElementById('replay'); if (rp) rp.addEventListener('click', function(){ try{localStorage.removeItem('archie-intro-seen');}catch(e){} location.reload(); });
+  } else if (site) { site.classList.add('on'); }
+  // command line
+  var cmd = document.getElementById('cmd'), reply = document.getElementById('reply');
+  if (cmd) {
+    var root = location.pathname.indexOf('/projects/') > -1 ? '../' : '';
+    var MODS = {"resell-logger":"Resell Logger","temperature-logger":"Temperature Logger","coconut-shy":"Coconut Shy","flappy-bird":"Flappy Bird","dartboard":"Dartboard — game-ready asset","ableton-automation":"Automation in Ableton"};
+    cmd.addEventListener('keydown', function(e){
+      if (e.key !== 'Enter') return; var v = cmd.value.trim().toLowerCase(); cmd.value = ''; if (!v) return;
+      if (v === 'help') reply.textContent = 'ls · open <project> · replay · home · about · theme light|dark · clear';
+      else if (v === 'replay' || v === 'intro' || v === 'run' || v === 'reboot') { reply.textContent = 'rebooting…'; try{localStorage.removeItem('archie-intro-seen');}catch(e){} location.href = root + 'index.html?intro'; }
+      else if (v === 'ls') reply.textContent = Object.keys(MODS).join('  ');
+      else if (v === 'home') location.href = root + 'index.html';
+      else if (v === 'about') location.href = root + 'index.html#about';
+      else if (v === 'clear') reply.textContent = '';
+      else if (v === 'theme light' || v === 'theme dark') { var n = v.split(' ')[1]; document.documentElement.setAttribute('data-theme', n); try{localStorage.setItem('archie-theme', n);}catch(e){} reply.textContent = 'theme → ' + n; }
+      else if (v.indexOf('open ') === 0) { var q = v.slice(5).trim(); var hit = Object.keys(MODS).filter(function(k){ return k.indexOf(q) === 0 || k.indexOf(q.replace(/ +/g,'-')) > -1; })[0]; if (hit) { reply.textContent = 'opening ' + MODS[hit] + '…'; location.href = root + 'projects/' + hit + '.html'; } else reply.textContent = 'no such project: ' + q; }
+      else if (v === 'sudo make me a sandwich') reply.textContent = 'okay.';
+      else reply.textContent = v + ': command not found — try help';
+    });
+  }
+  var fine = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (fine && !reduce) {
+    document.querySelectorAll('.card-media').forEach(function(m){
+      var v = m.querySelector('video'); if (!v) return;
+      m.closest('.card').addEventListener('mouseenter', function(){ if (!v.src) v.src = v.getAttribute('data-src'); v.currentTime = 0; v.play().catch(function(){}); m.classList.add('playing'); });
+      m.closest('.card').addEventListener('mouseleave', function(){ v.pause(); m.classList.remove('playing'); });
+    });
+  }
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function(){ var h = document.documentElement; var max = h.scrollHeight - h.clientHeight; bar.style.transform = 'scaleX(' + (max > 0 ? h.scrollTop / max : 0) + ')'; };
+    addEventListener('scroll', tick, {passive:true}); tick();
+  }
+})();
+</script>
+</body>
+</html>
